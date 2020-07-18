@@ -1,0 +1,16 @@
+cycler==0.10.0
+Cython==0.29.21
+dartsclone==0.9.0
+future==0.18.2
+kiwisolver==1.2.0
+matplotlib==3.2.2
+numpy==1.19.0
+pandas==1.0.5
+pyparsing==2.4.7
+python-dateutil==2.8.1
+pytz==2020.1
+six==1.15.0
+sortedcontainers==2.1.0
+SudachiDict-full==20200330
+SudachiPy==0.4.9
+torch==1.5.1
