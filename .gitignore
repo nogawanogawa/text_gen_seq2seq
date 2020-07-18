@@ -148,3 +148,10 @@ dmypy.json
 .pytype/
 
 # End of https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks
+mlruns/
+
+.bash_history
+
+.python_history
+
+.metaflow/
