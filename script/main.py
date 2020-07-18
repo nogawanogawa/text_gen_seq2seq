@@ -30,7 +30,7 @@ class TextGenFlow(FlowSpec):
     def train(self):
         print("Training...")
         self.trainer = Trainer(src=self.src, target=self.target, pairs=self.pairs)
-        self.encoder, self.decoder = self.trainer.trainIters(encoder=self.encoder, decoder=self.attn_decoder, n_iters=10)
+        self.encoder, self.decoder = self.trainer.trainIters(encoder=self.encoder, decoder=self.attn_decoder, n_iters=75000)
         self.next(self.end)
 
     @step
