@@ -16,7 +16,6 @@ class Lang:
         self.word2count = {}
         self.index2word = {0: "SOS", 1: "EOS"}
         self.n_words = 2  # Count SOS and EOS
-        self.sudachi = SudachiTokenizer()
 
     def addSentence(self, sentence):
         """辞書に文を登録する
@@ -24,7 +23,8 @@ class Lang:
         Args:
             sentence ([str]): [登録する文]
         """
-        for word in self.sudachi.get_token(sentence):
+        sudachi = SudachiTokenizer()
+        for word in sudachi.get_token(sentence):
             self.addWord(word)
 
     def addWord(self, word):

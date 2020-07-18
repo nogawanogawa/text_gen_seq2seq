@@ -155,3 +155,5 @@ mlruns/
 .python_history
 
 .metaflow/
+
+model/

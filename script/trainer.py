@@ -5,7 +5,11 @@ import random
 import torch
 import torch.nn as nn
 from torch import optim
+import torchvision
 from tokenizer import SudachiTokenizer
+from mlflow import log_metric, log_param, log_artifact
+import mlflow.pytorch
+import os
 
 SOS_token = 0
 EOS_token = 1
@@ -13,6 +17,8 @@ EOS_token = 1
 INPUT = "INPUT"
 OUTPUT = "OUTPUT"
 MAX_LENGTH = 30
+ENCODER_MODEL_PATH="model/encoder"
+DECODER_MODEL_PATH="model/decoder"
 
 class Trainer:
     def __init__(self, src, target, pairs):
@@ -21,6 +27,9 @@ class Trainer:
         self.target = target
         self.pairs = pairs
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        if not os.path.exists('model'):
+            os.mkdir('model')
+
 
     def asMinutes(self, s):
         """ 秒 -> 分に変換
@@ -179,7 +188,7 @@ class Trainer:
         """
         encoder.to(self.device)
         decoder.to(self.device)
-        
+
         start = time.time()
         print_loss_total = 0  # Reset every print_every
         plot_loss_total = 0  # Reset every plot_every
@@ -190,23 +199,38 @@ class Trainer:
                         for i in range(n_iters)]
         criterion = nn.NLLLoss()
 
-        for iter in range(1, n_iters + 1):
-            print(iter)
-            training_pair = training_pairs[iter - 1]
-            input_tensor = training_pair[0]
-            target_tensor = training_pair[1]
+        # for mlflow tracking
+        with mlflow.start_run() as run:
 
-            loss = self.train(input_tensor, target_tensor, encoder,
-                        decoder, encoder_optimizer, decoder_optimizer, criterion)
-            print_loss_total += loss
-            plot_loss_total += loss
+            # mlflow
+            log_param("n_iters", n_iters)
+            log_param("learning_rate", learning_rate)
 
-            if iter % print_every == 0:
-                print_loss_avg = print_loss_total / print_every
-                print_loss_total = 0
-                print('%s (%d %d%%) %.4f' % (self.timeSince(start, iter / n_iters),
-                                            iter, iter / n_iters * 100, print_loss_avg))
-        
+            for iter in range(1, n_iters + 1):
+                training_pair = training_pairs[iter - 1]
+                input_tensor = training_pair[0]
+                target_tensor = training_pair[1]
+
+                loss = self.train(input_tensor, target_tensor, encoder,
+                            decoder, encoder_optimizer, decoder_optimizer, criterion)
+                print_loss_total += loss
+                plot_loss_total += loss
+
+                if iter % print_every == 0:
+                    print_loss_avg = print_loss_total / print_every
+                    print_loss_total = 0
+                    print('%s (%d %d%%) %.4f' % (self.timeSince(start, iter / n_iters),
+                                                iter, iter / n_iters * 100, print_loss_avg))
+                    # mlflow
+                    log_metric("loss", loss, step=iter-1)
+
+
+            # mlflow 
+            mlflow.pytorch.log_model(encoder, "encoder")
+            mlflow.pytorch.log_model(decoder, "decoder")
+            mlflow.pytorch.save_model(encoder, ENCODER_MODEL_PATH)
+            mlflow.pytorch.save_model(decoder, DECODER_MODEL_PATH)
+
         return encoder, decoder
 
 

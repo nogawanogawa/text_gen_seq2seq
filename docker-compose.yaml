@@ -6,3 +6,4 @@ services:
         - .:/home
     ports: 
         - "5000:5000"
+    command: mlflow ui
