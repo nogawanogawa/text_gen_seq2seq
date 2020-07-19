@@ -17,8 +17,6 @@ EOS_token = 1
 INPUT = "INPUT"
 OUTPUT = "OUTPUT"
 MAX_LENGTH = 30
-ENCODER_MODEL_PATH="model/encoder"
-DECODER_MODEL_PATH="model/decoder"
 
 class Trainer:
     def __init__(self, src, target, pairs):
@@ -228,8 +226,6 @@ class Trainer:
             # mlflow 
             mlflow.pytorch.log_model(encoder, "encoder")
             mlflow.pytorch.log_model(decoder, "decoder")
-            mlflow.pytorch.save_model(encoder, ENCODER_MODEL_PATH)
-            mlflow.pytorch.save_model(decoder, DECODER_MODEL_PATH)
 
         return encoder, decoder
 
